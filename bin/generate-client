@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'heroics'
+
+schema_url = "https://gateway-sandbox.degica.com/api/v1/schema.json"
+schema = Heroics.download_schema(schema_url, {})
+endpoint_url = "https://api.komoju.com"
+
+headers = []
+headers << "# encoding: utf-8"
+headers << "require 'komoju/version'"
+headers << "require 'komoju/client'\n"
+
+client = Heroics.generate_client("Komoju", schema, endpoint_url, {})
+client.concat(headers.join("\n"))
+
+File.write(File.join(File.dirname(__FILE__), "../lib/komoju.rb"), client)
