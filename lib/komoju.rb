@@ -78,7 +78,7 @@ module Komoju
     {
       default_headers: default_headers,
       cache:           cache,
-      url:             "https://api.komomju.com"
+      url:             "https://api.komoju.com"
     }
   end
 
