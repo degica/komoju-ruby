@@ -1,3 +1,14 @@
+GIT
+  remote: git://github.com/komoju/heroics.git
+  revision: 8a4ca928e48285b691ac2329143b49e5bac18270
+  specs:
+    heroics (0.0.13)
+      erubis (~> 2.7.0)
+      excon
+      moneta
+      multi_json (>= 1.9.2)
+      netrc
+
 PATH
   remote: .
   specs:
@@ -9,13 +20,7 @@ GEM
   specs:
     ansi (1.5.0)
     erubis (2.7.0)
-    excon (0.44.4)
-    heroics (0.0.13)
-      erubis (~> 2.7.0)
-      excon
-      moneta
-      multi_json (>= 1.9.2)
-      netrc
+    excon (0.45.1)
     minitest (4.7.5)
     moneta (0.8.0)
     multi_json (1.11.0)
@@ -30,6 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.7)
+  heroics!
   komoju!
   minitest (= 4.7.5)
   rake (~> 10.0)
