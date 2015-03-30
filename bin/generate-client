@@ -4,7 +4,7 @@ require 'heroics'
 
 schema_url = "https://gateway-sandbox.degica.com/api/v1/schema.json"
 schema = Heroics.download_schema(schema_url, {})
-endpoint_url = "https://api.komoju.com"
+endpoint_url = "https://komoju.com/api/v1"
 
 client = Heroics.generate_client("Komoju", schema, endpoint_url, {})
 File.write(File.join(File.dirname(__FILE__), "../lib/komoju/client.rb"), client)
