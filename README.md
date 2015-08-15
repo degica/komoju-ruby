@@ -1,6 +1,6 @@
 # Komoju
 
-Komoju API Ruby Bindings
+[Komoju](https://komoju.com) API Ruby Bindings
 
 ## Installation
 
