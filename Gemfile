@@ -5,5 +5,5 @@ gemspec
 
 group :development do
   # Contains custom generator code for komoju-ruby client
-  gem 'heroics', github: 'komoju/heroics'
+  gem 'heroics', github: 'komoju/heroics', branch: "komoju"
 end
