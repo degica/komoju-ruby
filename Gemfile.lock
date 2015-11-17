@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/komoju/heroics.git
-  revision: 660bc4e362b696b2346ef81b05ea35aa19b08036
+  revision: 3fd1055729ae458f3ba28a412041a8d4dd19b6d2
   branch: komoju
   specs:
     heroics (0.0.14)
