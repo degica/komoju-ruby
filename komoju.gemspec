@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["richard@rramsden.ca"]
   spec.summary       = %q{Komoju Ruby Bindings}
   spec.description   = %q{These are the ruby bindings for the Komoju API}
-  spec.homepage      = ""
+  spec.homepage      = "https://komoju.com"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
