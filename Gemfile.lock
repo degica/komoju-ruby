@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    komoju (0.0.2)
+    komoju (0.0.3)
       erubis (~> 2.0)
       excon
       moneta
