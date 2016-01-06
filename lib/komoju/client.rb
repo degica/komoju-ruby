@@ -118,7 +118,7 @@ module Komoju
       @subscriptions_resource ||= Subscriptions.new(@client)
     end
 
-    # Subscription Customers
+    # Customers
     #
     # @return [Customers]
     def customers
@@ -284,15 +284,15 @@ module Komoju
       @client.subscriptions.create(body)
     end
 
-    # Destroy a subscription
+    # Delete a subscription
     #
     # @param subscriptions_id: A unique identifier for a subscription.
-    def destroy(subscriptions_id)
-      @client.subscriptions.destroy(subscriptions_id)
+    def delete(subscriptions_id)
+      @client.subscriptions.delete(subscriptions_id)
     end
   end
 
-  # Subscription Customers
+  # Customers
   class Customers
     def initialize(client)
       @client = client
@@ -327,11 +327,11 @@ module Komoju
       @client.customers.update(customers_id, body)
     end
 
-    # Destroy a customer
+    # Delete a customer
     #
     # @param customers_id: A unique identifier for the customer.
-    def destroy(customers_id)
-      @client.customers.destroy(customers_id)
+    def delete(customers_id)
+      @client.customers.delete(customers_id)
     end
   end
 
@@ -368,6 +368,14 @@ module Komoju
     def preview(body)
       @client.invoices.preview(body)
     end
+
+    # Pay an invoice
+    #
+    # @param invoices_id: A unique identifier for the invoice.
+    # @param body: the object to pass as the request payload
+    def pay(invoices_id, body)
+      @client.invoices.pay(invoices_id, body)
+    end
   end
 
   # Subscription Invoice Items
@@ -379,8 +387,9 @@ module Komoju
     # List invoice items
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.invoice_items.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.invoice_items.list(collection_options, body)
     end
 
     # Show an invoice item
@@ -432,11 +441,11 @@ module Komoju
       @client.plans.create(body)
     end
 
-    # Destroy a plan
+    # Delete a plan
     #
     # @param plans_name: Name of the plan.
-    def destroy(plans_name)
-      @client.plans.destroy(plans_name)
+    def delete(plans_name)
+      @client.plans.delete(plans_name)
     end
   end
 
@@ -455,6 +464,2297 @@ module Komoju
   end
 
   SCHEMA = Heroics::Schema.new(MultiJson.load(<<-'HEROICS_SCHEMA'))
-{"$schema":"http://json-schema.org/draft-04/hyper-schema","definitions":{"list":{"type":["object"],"properties":{"resource":{"enum":["list"]},"total":{"type":["integer"]},"page":{"type":["integer"]},"per_page":{"type":["integer"]},"last_page":{"type":["integer"]},"data":{"oneOf":[{"type":["array"],"items":{"$ref":"#/definitions/payments"}},{"type":["array"],"items":{"$ref":"#/definitions/payouts"}},{"type":["array"],"items":{"$ref":"#/definitions/payouts/definitions/payout_item"}},{"type":["array"],"items":{"$ref":"#/definitions/events"}},{"type":["array"],"items":{"$ref":"#/definitions/tokens"}},{"type":["array"],"items":{"$ref":"#/definitions/customers"}},{"type":["array"],"items":{"$ref":"#/definitions/plans"}},{"type":["array"],"items":{"$ref":"#/definitions/subscriptions"}},{"type":["array"],"items":{"$ref":"#/definitions/invoices"}},{"type":["array"],"items":{"$ref":"#/definitions/invoice_items"}}]}}},"events":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"66a4824ac97cc7afff608f27c7","readOnly":true,"type":["string"],"description":"A unique identifier for an event."},"type":{"example":"payment.authorized","readOnly":true,"type":["string"]},"data":{"readOnly":true,"type":["object"],"description":"An object which creates an event"},"resource":{"example":"event","readOnly":true,"enum":["event"],"description":"Name of resource"},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","readOnly":true,"type":["string"],"description":"An ISO 8601 formatted timestamp of when the event was created."}},"links":[{"title":"List","description":"List events","href":"/events","method":"GET","rel":"instances","response_example":"events#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a event","href":"/events/{(%2Fdefinitions%2Fevents%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"events#show","targetSchema":{"$ref":"#/definitions/events/"}}],"properties":{"id":{"$ref":"#/definitions/events/definitions/id"},"type":{"$ref":"#/definitions/events/definitions/type"},"resource":{"$ref":"#/definitions/events/definitions/resource"},"data":{"$ref":"#/definitions/events/definitions/data"},"created_at":{"$ref":"#/definitions/events/definitions/created_at"}},"description":"Event Resource","title":"Events"},"payments":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"given_name":{"type":["string"]},"family_name":{"type":["string"]},"given_name_kana":{"type":["string"]},"family_name_kana":{"type":["string"]},"email":{"type":["string"],"format":"email"},"phone":{"type":["string"],"pattern":"\\A([() \\-_+]*[0-9]){10}[() \\-_+0-9]*\\Z"},"expiry_days":{"type":["integer"],"minimum":0,"maximum":59,"exclusiveMinimum":false,"exclusiveMaximum":false},"instructions_url":{"type":["string"],"format":"uri"},"external_order_num":{"type":["string"]},"bank_transfer_request":{"type":["object"],"properties":{"type":{"enum":["bank_transfer"]},"phone":{"$ref":"#/definitions/payments/definitions/phone"},"email":{"$ref":"#/definitions/payments/definitions/email"},"given_name":{"$ref":"#/definitions/payments/definitions/given_name"},"family_name":{"$ref":"#/definitions/payments/definitions/family_name"},"given_name_kana":{"$ref":"#/definitions/payments/definitions/given_name_kana"},"family_name_kana":{"$ref":"#/definitions/payments/definitions/family_name_kana"},"expiry_days":{"$ref":"#/definitions/payments/definitions/expiry_days"}},"required":["type","given_name","family_name","given_name_kana","family_name_kana","phone","email"]},"bank_transfer_response":{"type":["object"],"properties":{"type":{"enum":["bank_transfer"]},"email":{"$ref":"#/definitions/payments/definitions/email"},"order_id":{"type":["string"]},"bank_name":{"type":["string"]},"account_number":{"type":["integer"]},"account_type":{"type":["string"]},"account_name":{"type":["string"]}},"required":["type","email","order_id","bank_name","account_number","account_type","account_name"]},"konbini_request":{"type":["object"],"properties":{"type":{"enum":["konbini"]},"store":{"enum":["seven-eleven","lawson","family-mart","sunkus","circle-k","ministop","daily-yamazaki"]},"email":{"$ref":"#/definitions/payments/definitions/email"},"phone":{"$ref":"#/definitions/payments/definitions/phone"},"expiry_days":{"$ref":"#/definitions/payments/definitions/expiry_days"}},"required":["type","store","phone","email"]},"konbini_response":{"type":["object"],"properties":{"type":{"enum":["konbini"]},"store":{"enum":["seven-eleven","lawson","family-mart","sunkus","circle-k","ministop","daily-yamazaki"]},"instructions_url":{"$ref":"#/definitions/payments/definitions/instructions_url"},"confirmation_code":{"type":["string"]},"receipt":{"type":["string"]}},"required":["type","store","confirmation_code","receipt","instructions_url"]},"pay_easy_request":{"type":["object"],"properties":{"type":{"enum":["pay_easy"]},"email":{"$ref":"#/definitions/payments/definitions/email"},"given_name":{"$ref":"#/definitions/payments/definitions/given_name"},"family_name":{"$ref":"#/definitions/payments/definitions/family_name"},"given_name_kana":{"$ref":"#/definitions/payments/definitions/given_name_kana"},"family_name_kana":{"$ref":"#/definitions/payments/definitions/family_name_kana"},"instructions_url":{"$ref":"#/definitions/payments/definitions/instructions_url"},"phone":{"$ref":"#/definitions/payments/definitions/phone"},"expiry_days":{"$ref":"#/definitions/payments/definitions/expiry_days"}},"required":["type","given_name","family_name","given_name_kana","family_name_kana","email","phone"]},"pay_easy_response":{"type":["object"],"properties":{"type":{"enum":["pay_easy"]},"pay_url":{"type":["string"]},"instructions_url":{"$ref":"#/definitions/payments/definitions/instructions_url"}},"required":["type","pay_url","instructions_url"]},"web_money_request":{"type":["object"],"properties":{"type":{"enum":["web_money"]},"prepaid_number":{"type":["string"],"maxLength":16}},"required":["type","prepaid_number"]},"web_money_response":{"type":["object"],"properties":{"type":{"enum":["web_money"]},"short_amount":{"type":["integer"]}},"required":["type","short_amount"]},"credit_card_request":{"type":["object"],"properties":{"type":{"enum":["credit_card"]},"number":{"type":["string"]},"month":{"type":["integer"]},"year":{"type":["integer"]},"verification_value":{"type":["string"]},"given_name":{"$ref":"#/definitions/payments/definitions/given_name"},"family_name":{"$ref":"#/definitions/payments/definitions/family_name"},"last_four_digits":{"type":["string"]},"brand":{"enum":["visa","american_express","master","jcb"]}},"required":["type","number","month","year","given_name","family_name"]},"credit_card_response":{"type":["object"],"properties":{"type":{"enum":["credit_card"]},"month":{"type":["integer"]},"year":{"type":["integer"]},"last_four_digits":{"type":["string"]},"brand":{"enum":["visa","american_express","master","jcb"]}},"required":["type","brand","last_four_digits","month","year"]},"id":{"example":"94f128d4021b049bc616f5b1b0","readOnly":true,"type":["string"],"description":"A unique indentifier for the payment"},"resource":{"example":"payment","enum":["payment"],"description":"Value of `resource`."},"status":{"example":"pending","enum":["pending","authorized","captured","expired","cancelled","refunded"],"description":"The status of the payment."},"amount":{"example":"300","minimum":0,"type":["number"],"description":"The amount to be charged before tax. Must be equal or greater than 0. Use a ‘.’ as a decimal separator, and no thousands separator"},"tax":{"example":"30","type":["number","null"],"description":"The amount of tax to be charged, or ‘auto’ to use the current consumption tax rate in Japan. Use a ‘.’ as a decimal separator, and no thousands separator. If the tax is more precise than the currency allows, it will be rounded using a round half up algorithm."},"payment_deadline":{"format":"date-time","example":"2015-03-09T06:52:34Z","type":["string","null"],"description":"Time when the payment will expire. This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ."},"payment_method_fee":{"example":"0","type":["number"],"minimum":0,"description":"An additional fee added to specific payment types"},"total":{"example":"330","type":["number"],"description":"The payment total, this is the amount + tax + payment_method_fee"},"currency":{"example":"JPY","enum":["JPY","USD"],"description":"3 letter ISO currency code of the transaction"},"description":{"example":"","type":["string","null"],"description":"Description of the payment (used in e-mail receipts if enabled)."},"subscription":{"example":null,"type":["object","null"],"description":"Shown if payment was part of a subscription"},"captured_at":{"example":"2015-03-09T06:52:34Z","type":["string","null"],"description":"An ISO 8601 formatted timestamp of when a payment was captured"},"metadata":{"type":["object","null"],"example":{"order_id":"abcdefghijklmn"},"description":"A set of key-value pairs"},"payment_details_request":{"description":"A hash or token describing the payment method used to make the payment.","example":{"type":["konbini"],"store":"lawson","email":"foo@bar.com","phone":"08011111111"},"type":["string","object"],"properties":{"type":{"enum":["credit_card","bank_transfer","konbini","pay_easy","web_money"]}},"required":["type"]},"payment_details_response":{"description":"A hash or token describing the payment method used to make the payment.","example":{"type":["konbini"],"store":"lawson","confirmation_code":null,"receipt":"12345"},"oneOf":[{"type":["null"]},{"$ref":"#/definitions/payments/definitions/bank_transfer_response"},{"$ref":"#/definitions/payments/definitions/credit_card_response"},{"$ref":"#/definitions/payments/definitions/konbini_response"},{"$ref":"#/definitions/payments/definitions/pay_easy_response"},{"$ref":"#/definitions/payments/definitions/web_money_response"}]},"fraud_details":{"type":["object","null"],"properties":{"customer_ip":{"format":"ipv4","type":["string"]},"customer_email":{"format":"email","type":["string"]},"browser_language":{"type":["string"]},"browser_user_agent":{"type":["string"]}},"dependencies":{"customer_email":["customer_ip"],"browser_language":["customer_ip"],"browser_user_agent":["customer_ip"]},"additionalProperties":false},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","type":["string"],"description":"An ISO 8601 formatted timestamp of when a payment was created"}},"links":[{"title":"List","description":"List payments","href":"/payments","method":"GET","rel":"instances","response_example":"payments#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a payment","href":"/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"payments#show","targetSchema":{"$ref":"#/definitions/payments/"}},{"title":"Create","description":"Create a payment","href":"/payments","method":"POST","rel":"create","response_example":"payments#create","targetSchema":{"$ref":"#/definitions/payments/"},"schema":{"type":["object"],"properties":{"amount":{"$ref":"#/definitions/payments/definitions/amount"},"tax":{"$ref":"#/definitions/payments/definitions/tax"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"external_order_num":{"$ref":"#/definitions/payments/definitions/external_order_num"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_request"},"fraud_details":{"$ref":"#/definitions/payments/definitions/fraud_details"}},"required":["amount","currency","payment_details"],"additionalProperties":false}},{"title":"Update","description":"Update a payment","href":"/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}","method":"PATCH","rel":"self","response_example":"payments#update","targetSchema":{"$ref":"#/definitions/payments/"},"schema":{"type":["object"],"properties":{"description":{"$ref":"#/definitions/payments/definitions/description"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"payment_details":{"type":["object"],"properties":{"type":{"enum":["web_money"]}},"required":["type"]}},"additionalProperties":false}},{"title":"Refund","description":"Refund a payment","href":"/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}/refund","method":"POST","rel":"self","response_example":"payments#refund","targetSchema":{"$ref":"#/definitions/payments/"},"schema":{"type":["object"],"properties":{"amount":{"$ref":"#/definitions/payments/definitions/amount"},"description":{"$ref":"#/definitions/payments/definitions/description"}}}},{"title":"Cancel","description":"Cancel a payment","href":"/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}/cancel","method":"POST","rel":"self","response_example":"payments#cancel","targetSchema":{"$ref":"#/definitions/payments/"}}],"properties":{"id":{"$ref":"#/definitions/payments/definitions/id"},"resource":{"$ref":"#/definitions/payments/definitions/resource"},"status":{"$ref":"#/definitions/payments/definitions/status"},"amount":{"$ref":"#/definitions/payments/definitions/amount"},"tax":{"$ref":"#/definitions/payments/definitions/tax"},"payment_deadline":{"$ref":"#/definitions/payments/definitions/payment_deadline"},"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_response"},"payment_method_fee":{"$ref":"#/definitions/payments/definitions/payment_method_fee"},"total":{"$ref":"#/definitions/payments/definitions/total"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"description":{"$ref":"#/definitions/payments/definitions/description"},"subscription":{"$ref":"#/definitions/payments/definitions/subscription"},"captured_at":{"$ref":"#/definitions/payments/definitions/captured_at"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"created_at":{"$ref":"#/definitions/payments/definitions/created_at"},"refunds":{"type":["array"]}},"description":"Payment resource","title":"Payments"},"payouts":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"66a4824ac97cc7afff608f27c7","readOnly":true,"type":["string"],"description":"A unique identifier for a payout."},"resource":{"example":"event","readOnly":true,"enum":["payout"],"description":"Name of resource"},"payout_item":{"readOnly":true,"type":["object"],"properties":{"resource":{"example":"payout_item","readOnly":true,"enum":["payout_item"],"description":"Name of resource."},"event_type":{"example":"capture","readOnly":true,"enum":["capture","refund"],"description":"Describes whether the payout item is from a captured or refunded payment."},"timestamp":{"example":"2015-03-06T06:52:35Z","readOnly":true,"format":"date-time","description":"Timestamp describing when the payment was either captured or refunded."},"payment_method":{"example":"visa","readOnly":true,"enum":["visa","master_card","american_express","jcb","bank_transfer","web_money","lawson","family-mart","sunkus","circle-k","ministop","daily-yamazaki","seven-eleven"],"description":"The payment method of the payment."},"payment_fee":{"example":"300","type":["number"],"description":"Komoju platform fee deducted from the payment total."},"receivable":{"example":"300","type":["number"],"description":"The amount paid to your account for a given payment."},"amount":{"$ref":"#/definitions/payments/definitions/amount"},"tax":{"$ref":"#/definitions/payments/definitions/tax"},"total":{"$ref":"#/definitions/payments/definitions/total"}},"description":"Payout Item Resource"},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","readOnly":true,"type":["string"],"description":"An ISO 8601 formatted timestamp of when the payout was created."}},"links":[{"title":"List","description":"List payouts","href":"/payouts","method":"GET","rel":"instances","response_example":"payouts#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a payout","href":"/payouts/{(%2Fdefinitions%2Fpayouts%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"payouts#show","targetSchema":{"$ref":"#/definitions/payouts/"}},{"title":"Payout Items","description":"List payout items","href":"/payouts/{(%2Fdefinitions%2Fpayouts%2Fdefinitions%2Fid)}/payout_items","method":"GET","rel":"instances","response_example":"payouts#payout_items","targetSchema":{"$ref":"#/definitions/list/"}}],"properties":{"id":{"$ref":"#/definitions/payouts/definitions/id"},"resource":{"$ref":"#/definitions/payouts/definitions/resource"},"payout_items":{"$ref":"#/definitions/list/"},"created_at":{"$ref":"#/definitions/payouts/definitions/created_at"}},"description":"Payout Resource","title":"Payouts"},"subscriptions":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"66a4824ac97cc7afff608f27c7","readOnly":true,"type":["string"],"description":"A unique identifier for a subscription."},"resource":{"example":"subscription","readOnly":true,"enum":["subscription"],"description":"Name of resource"},"status":{"example":"pending","readOnly":true,"enum":["cancelled","pending","active","past_due"],"description":"The status of the subscription."},"plan":{"$ref":"#/definitions/plans"},"customer":{"$ref":"#/definitions/customers"},"current_period_end_at":{"example":null,"format":"date-time","readOnly":true,"type":["string","null"],"description":"An ISO 8601 formatted timestamp of when the subscription will next be billed."},"cancel_at_period_end":{"type":["boolean"]},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","readOnly":true,"type":["string"],"description":"An ISO 8601 formatted timestamp of when the plan was created."}},"links":[{"title":"List","description":"List subscriptions","href":"/subscriptions","method":"GET","rel":"instances","response_example":"subscriptions#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a subscription","href":"/subscriptions/{(%2Fdefinitions%2Fsubscriptions%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"subscriptions#show","targetSchema":{"$ref":"#/definitions/subscriptions/"}},{"title":"Create","description":"Create a subscription","href":"/subscriptions","method":"POST","rel":"create","response_example":"subscriptions#create","targetSchema":{"$ref":"#/definitions/subscriptions/"},"schema":{"type":["object"],"properties":{"customer":{"type":["string"]},"plan":{"type":["string"]},"metadata":{"$ref":"#/definitions/subscriptions/definitions/metadata"}},"required":["customer","plan"]}},{"title":"Destroy","description":"Destroy a subscription","href":"/subscriptions/{(%2Fdefinitions%2Fsubscriptions%2Fdefinitions%2Fid)}","method":"DELETE","rel":"destroy","response_example":"subscriptions#destroy","targetSchema":{"$ref":"#/definitions/subscriptions/"}}],"properties":{"id":{"$ref":"#/definitions/subscriptions/definitions/id"},"resource":{"$ref":"#/definitions/subscriptions/definitions/resource"},"status":{"$ref":"#/definitions/subscriptions/definitions/status"},"plan":{"$ref":"#/definitions/subscriptions/definitions/plan"},"customer":{"$ref":"#/definitions/subscriptions/definitions/customer"},"current_period_end_at":{"$ref":"#/definitions/subscriptions/definitions/current_period_end_at"},"metadata":{"$ref":"#/definitions/subscriptions/definitions/metadata"},"created_at":{"$ref":"#/definitions/subscriptions/definitions/created_at"}},"description":"Subscription Resource","title":"Subscriptions"},"customers":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"fa799fca14be29d3fae455f22d","readOnly":true,"type":["string"],"description":"A unique identifier for the customer."},"resource":{"example":"customer","readOnly":true,"enum":["customer"],"description":"Name of resource"},"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_response"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"email":{"type":["string","null"],"format":"email","description":"Customer's email address."},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","readOnly":true,"type":["string"],"description":"An ISO 8601 formatted timestamp of when the customer was created."}},"links":[{"title":"List","description":"List customers","href":"/customers","method":"GET","rel":"instances","response_example":"customers#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a customer","href":"/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"customers#show","targetSchema":{"$ref":"#/definitions/customers/"}},{"title":"Create","description":"Create a customer","href":"/customers","method":"POST","rel":"create","response_example":"customers#create","targetSchema":{"$ref":"#/definitions/customers/"},"schema":{"type":["object"],"properties":{"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_request"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"email":{"$ref":"#/definitions/customers/definitions/email"},"metadata":{"$ref":"#/definitions/customers/definitions/metadata"}},"required":["currency","payment_details"],"additionalFields":false}},{"title":"Update","description":"Update customers","href":"/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}","method":"PATCH","rel":"self","response_example":"customers#update","schema":{"type":["object"],"properties":{"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_request"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"email":{"$ref":"#/definitions/customers/definitions/email"},"metadata":{"$ref":"#/definitions/customers/definitions/metadata"}},"required":["payment_details"],"additionalFields":false},"targetSchema":{"$ref":"#/definitions/customers/"}},{"title":"Destroy","description":"Destroy a customer","href":"/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}","method":"DELETE","rel":"destroy","response_example":"customers#destroy","targetSchema":{"$ref":"#/definitions/customers/"}}],"properties":{"id":{"$ref":"#/definitions/customers/definitions/id"},"resource":{"$ref":"#/definitions/customers/definitions/resource"},"email":{"$ref":"#/definitions/customers/definitions/email"},"metadata":{"$ref":"#/definitions/customers/definitions/metadata"},"created_at":{"$ref":"#/definitions/customers/definitions/created_at"}},"description":"Subscription Customers","title":"Customers"},"invoices":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"66a4824ac97cc7afff608f27c7","readOnly":true,"type":["string"],"description":"A unique identifier for the invoice."},"resource":{"example":"invoice","readOnly":true,"enum":["invoice"],"description":"Name of resource."},"invoice":{"readOnly":true,"type":["string","null"]},"paid":{"readOnly":true,"type":["boolean"]},"created_at":{"readOnly":true,"format":"date-time","type":["string","null"],"description":"An ISO 8601 formatted timestamp of when the invoice was created."}},"links":[{"title":"List","description":"List invoices","href":"/invoices","method":"GET","rel":"instances","response_example":"invoices#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show an invoice","href":"/invoices/{(%2Fdefinitions%2Finvoices%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"invoices#show","targetSchema":{"$ref":"#/definitions/invoices/"}},{"title":"Create","description":"Create an invoice","href":"/invoices","method":"POST","rel":"create","response_example":"invoices#create","targetSchema":{"$ref":"#/definitions/invoices/"},"schema":{"type":["object"],"properties":{"customer":{"$ref":"#/definitions/customers/definitions/id"},"metadata":{"$ref":"#/definitions/subscriptions/definitions/metadata"}},"required":["customer"]}},{"title":"Preview","description":"Preview an upcoming invoice","href":"/invoices/preview","method":"GET","rel":"self","response_example":"invoices#preview","targetSchema":{"$ref":"#/definitions/invoices/"},"schema":{"type":["object"],"properties":{"subscription":{"$ref":"#/definitions/invoices/properties/subscription"}},"required":["subscription"]}}],"properties":{"id":{"$ref":"#/definitions/payments/definitions/id"},"resource":{"$ref":"#/definitions/invoices/definitions/resource"},"subscription":{"$ref":"#/definitions/subscriptions/definitions/id"},"paid":{"$ref":"#/definitions/invoices/definitions/paid"},"invoice_items":{"$ref":"#/definitions/list/"},"total":{"$ref":"#/definitions/payments/definitions/total"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"created_at":{"$ref":"#/definitions/invoices/definitions/created_at"}},"description":"Subscription Invoice","title":"Invoices"},"invoice_items":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"66a4824ac97cc7afff608f27c7","readOnly":true,"type":["string"],"description":"A unique identifier for the invoice items."},"resource":{"example":"invoice_item","readOnly":true,"enum":["invoice_item"],"description":"Name of resource"},"type":{"example":"invoice_item","readOnly":true,"enum":["invoice_item","plan"]},"plan":{"oneOf":[{"$ref":"#/definitions/plans/"},{"type":["null"]}]},"invoice":{"readOnly":true,"type":["string","null"]}},"links":[{"title":"List","description":"List invoice items","href":"/invoice_items","method":"GET","rel":"instances","response_example":"invoice_items#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show an invoice item","href":"/invoice_items/{(%2Fdefinitions%2Finvoice_items%2Fdefinitions%2Fid)}","method":"GET","rel":"self","response_example":"invoice_items#show","targetSchema":{"$ref":"#/definitions/invoice_items/"}},{"title":"Create","description":"Create an invoice item","href":"/invoice_items","method":"POST","rel":"create","response_example":"invoice_items#create","targetSchema":{"$ref":"#/definitions/invoice_items/"},"schema":{"type":["object"],"properties":{"amount":{"$ref":"#/definitions/invoice_items/properties/amount"},"currency":{"$ref":"#/definitions/invoice_items/properties/currency"},"customer":{"$ref":"#/definitions/invoice_items/properties/customer"},"metadata":{"$ref":"#/definitions/invoice_items/properties/metadata"}},"required":["amount","currency","customer"]}},{"title":"Destroy","description":"Deletes an invoice item from the upcoming invoice.","href":"/invoice_items/{(%2Fdefinitions%2Finvoice_items%2Fdefinitions%2Fid)}","method":"DELETE","rel":"destroy","response_example":"invoice_items#destroy","targetSchema":{"$ref":"#/definitions/invoice_items/"}}],"properties":{"id":{"$ref":"#/definitions/payments/definitions/id"},"resource":{"$ref":"#/definitions/invoice_items/definitions/resource"},"type":{"$ref":"#/definitions/invoice_items/definitions/type"},"amount":{"$ref":"#/definitions/payments/definitions/amount"},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"customer":{"$ref":"#/definitions/customers/definitions/id"},"invoice":{"$ref":"#/definitions/invoice_items/definitions/invoice"},"plan":{"$ref":"#/definitions/invoice_items/definitions/plan"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"}},"required":["id","resource","type","amount","customer","currency","invoice","metadata","plan"],"description":"Subscription Invoice Items","title":"Invoice Items"},"plans":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"name":{"example":"name2","type":["string"],"description":"Name of the plan."},"resource":{"example":"plan","enum":["plan"],"description":"Name of resource"},"interval":{"example":"month","enum":["day","week","month","year"],"description":"The billing frequency of a subscription."},"interval_count":{"example":"1","type":["integer"],"minimum":1,"description":"The number of intervals before the end of each billing period. For example, `interval=month` and `interval_count=3` would bill every 3 months."},"amount":{"$ref":"#/definitions/payments/definitions/amount"},"tax_percent":{"type":["integer","null"]},"currency":{"$ref":"#/definitions/payments/definitions/currency"},"metadata":{"$ref":"#/definitions/payments/definitions/metadata"},"renewal_notice_days":{"example":1,"type":["integer"],"minimum":0},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","readOnly":true,"type":["string"],"description":"An ISO 8601 formatted timestamp of when the plan was created."}},"links":[{"title":"List","description":"List plans","href":"/plans","method":"GET","rel":"instances","response_example":"plans#index","targetSchema":{"$ref":"#/definitions/list/"}},{"title":"Show","description":"Show a plan","href":"/plans/{(%2Fdefinitions%2Fplans%2Fdefinitions%2Fname)}","method":"GET","rel":"self","response_example":"plans#show","targetSchema":{"$ref":"#/definitions/plans/"}},{"title":"Create","description":"Create a plan","href":"/plans","method":"POST","rel":"create","response_example":"plans#create","targetSchema":{"$ref":"#/definitions/plans/"},"schema":{"type":["object"],"properties":{"name":{"$ref":"#/definitions/plans/definitions/name"},"interval":{"$ref":"#/definitions/plans/definitions/interval"},"interval_count":{"$ref":"#/definitions/plans/definitions/interval_count"},"amount":{"$ref":"#/definitions/plans/definitions/amount"},"tax_percent":{"$ref":"#/definitions/plans/definitions/tax_percent"},"currency":{"$ref":"#/definitions/plans/definitions/currency"},"renewal_notice_days":{"$ref":"#/definitions/plans/definitions/renewal_notice_days"},"metadata":{"$ref":"#/definitions/plans/definitions/metadata"}},"required":["name","interval","amount","currency"]}},{"title":"Destroy","description":"Destroy a plan","href":"/plans/{(%2Fdefinitions%2Fplans%2Fdefinitions%2Fname)}","method":"DELETE","rel":"destroy","response_example":"plans#destroy","targetSchema":{"$ref":"#/definitions/plans/"}}],"properties":{"resource":{"$ref":"#/definitions/plans/definitions/resource"},"name":{"$ref":"#/definitions/plans/definitions/name"},"interval":{"$ref":"#/definitions/plans/definitions/interval"},"interval_count":{"$ref":"#/definitions/plans/definitions/interval_count"},"currency":{"$ref":"#/definitions/plans/definitions/currency"},"amount":{"$ref":"#/definitions/plans/definitions/amount"},"tax_percent":{"$ref":"#/definitions/plans/definitions/tax_percent"},"renewal_notice_days":{"$ref":"#/definitions/plans/definitions/renewal_notice_days"},"metadata":{"$ref":"#/definitions/plans/definitions/metadata"},"created_at":{"$ref":"#/definitions/plans/definitions/created_at"}},"description":"Subscription Plans","title":"Plans"},"tokens":{"$schema":"http://json-schema.org/draft-04/hyper-schema","type":["object"],"definitions":{"id":{"example":"tok_ed4119a0f69bc365286d5a9a8777f33cee024f19d532454e6abffccc42cf1452b6ad214de6b8e876cabc60ae6f","readOnly":true,"type":["string"],"description":"A unique identifier for the token."},"resource":{"example":"token","enum":["token"],"description":"Name of resource"},"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_response"},"created_at":{"example":"2015-03-06T06:52:35Z","format":"date-time","type":["string"],"description":"An ISO 8601 formatted timestamp of when the token was created."}},"links":[{"title":"Create","description":"Create a token","href":"/tokens","method":"POST","rel":"create","response_example":"tokens#create","targetSchema":{"$ref":"#/definitions/list/"},"schema":{"type":["object"],"properties":{"payment_details":{"$ref":"#/definitions/payments/definitions/payment_details_request"}},"required":["payment_details"],"additionalFields":false}}],"properties":{"id":{"$ref":"#/definitions/tokens/definitions/id"},"resource":{"$ref":"#/definitions/tokens/definitions/resource"},"created_at":{"$ref":"#/definitions/tokens/definitions/created_at"}},"description":"Token resource","title":"Tokens"}},"properties":{"events":{"$ref":"#/definitions/events"},"payments":{"$ref":"#/definitions/payments"},"payouts":{"$ref":"#/definitions/payouts"},"subscriptions":{"$ref":"#/definitions/subscriptions"},"customers":{"$ref":"#/definitions/customers"},"invoices":{"$ref":"#/definitions/invoices"},"invoice_items":{"$ref":"#/definitions/invoice_items"},"plans":{"$ref":"#/definitions/plans"},"tokens":{"$ref":"#/definitions/tokens"}},"type":["object"],"id":"komoju","links":[{"href":"https://komoju.com/api/v1","rel":"self"}],"description":"Komoju API auto-generated JSON Schema","title":"Komoju API"}
+{
+  "$schema": "http://json-schema.org/draft-04/hyper-schema",
+  "definitions": {
+    "list": {
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "resource": {
+          "enum": [
+            "list"
+          ]
+        },
+        "total": {
+          "type": [
+            "integer"
+          ]
+        },
+        "page": {
+          "type": [
+            "integer"
+          ]
+        },
+        "per_page": {
+          "type": [
+            "integer"
+          ]
+        },
+        "last_page": {
+          "type": [
+            "integer"
+          ]
+        },
+        "data": {
+          "oneOf": [
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/payments"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/payouts"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/payouts/definitions/payout_item"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/events"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/tokens"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/customers"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/plans"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/subscriptions"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/invoices"
+              }
+            },
+            {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "$ref": "#/definitions/invoice_items"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "events": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "example": "66a4824ac97cc7afff608f27c7",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for an event."
+        },
+        "type": {
+          "example": "payment.authorized",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "data": {
+          "readOnly": true,
+          "type": [
+            "object"
+          ],
+          "description": "An object which creates an event"
+        },
+        "resource": {
+          "example": "event",
+          "readOnly": true,
+          "enum": [
+            "event"
+          ],
+          "description": "Name of resource"
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the event was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List events",
+          "href": "/events",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "events#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a event",
+          "href": "/events/{(%2Fdefinitions%2Fevents%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "events#show",
+          "targetSchema": {
+            "$ref": "#/definitions/events/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/events/definitions/id"
+        },
+        "type": {
+          "$ref": "#/definitions/events/definitions/type"
+        },
+        "resource": {
+          "$ref": "#/definitions/events/definitions/resource"
+        },
+        "data": {
+          "$ref": "#/definitions/events/definitions/data"
+        },
+        "created_at": {
+          "$ref": "#/definitions/events/definitions/created_at"
+        }
+      },
+      "description": "Event Resource",
+      "title": "Events"
+    },
+    "payments": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "given_name": {
+          "type": [
+            "string"
+          ]
+        },
+        "family_name": {
+          "type": [
+            "string"
+          ]
+        },
+        "given_name_kana": {
+          "type": [
+            "string"
+          ]
+        },
+        "family_name_kana": {
+          "type": [
+            "string"
+          ]
+        },
+        "email": {
+          "type": [
+            "string"
+          ],
+          "format": "email"
+        },
+        "phone": {
+          "type": [
+            "string"
+          ],
+          "pattern": "\\A([() \\-_+]*[0-9]){10}[() \\-_+0-9]*\\Z"
+        },
+        "customer": {
+          "type": [
+            "string"
+          ],
+          "description": "The ID of an existing customer in which to provide payment details for the payment."
+        },
+        "expiry_days": {
+          "type": [
+            "integer"
+          ],
+          "minimum": 0,
+          "maximum": 59,
+          "exclusiveMinimum": false,
+          "exclusiveMaximum": false
+        },
+        "instructions_url": {
+          "type": [
+            "string"
+          ],
+          "format": "uri"
+        },
+        "external_order_num": {
+          "type": [
+            "string"
+          ]
+        },
+        "bank_transfer_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "bank_transfer"
+              ]
+            },
+            "phone": {
+              "$ref": "#/definitions/payments/definitions/phone"
+            },
+            "email": {
+              "$ref": "#/definitions/payments/definitions/email"
+            },
+            "given_name": {
+              "$ref": "#/definitions/payments/definitions/given_name"
+            },
+            "family_name": {
+              "$ref": "#/definitions/payments/definitions/family_name"
+            },
+            "given_name_kana": {
+              "$ref": "#/definitions/payments/definitions/given_name_kana"
+            },
+            "family_name_kana": {
+              "$ref": "#/definitions/payments/definitions/family_name_kana"
+            },
+            "expiry_days": {
+              "$ref": "#/definitions/payments/definitions/expiry_days"
+            }
+          },
+          "required": [
+            "type",
+            "given_name",
+            "family_name",
+            "given_name_kana",
+            "family_name_kana",
+            "phone",
+            "email"
+          ]
+        },
+        "bank_transfer_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "bank_transfer"
+              ]
+            },
+            "email": {
+              "$ref": "#/definitions/payments/definitions/email"
+            },
+            "order_id": {
+              "type": [
+                "string"
+              ]
+            },
+            "bank_name": {
+              "type": [
+                "string"
+              ]
+            },
+            "account_number": {
+              "type": [
+                "integer"
+              ]
+            },
+            "account_type": {
+              "type": [
+                "string"
+              ]
+            },
+            "account_name": {
+              "type": [
+                "string"
+              ]
+            },
+            "instructions_url": {
+              "$ref": "#/definitions/payments/definitions/instructions_url"
+            }
+          },
+          "required": [
+            "type",
+            "email",
+            "order_id",
+            "bank_name",
+            "account_number",
+            "account_type",
+            "account_name",
+            "instructions_url"
+          ]
+        },
+        "konbini_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "konbini"
+              ]
+            },
+            "store": {
+              "enum": [
+                "seven-eleven",
+                "lawson",
+                "family-mart",
+                "sunkus",
+                "circle-k",
+                "ministop",
+                "daily-yamazaki"
+              ]
+            },
+            "email": {
+              "$ref": "#/definitions/payments/definitions/email"
+            },
+            "phone": {
+              "$ref": "#/definitions/payments/definitions/phone"
+            },
+            "expiry_days": {
+              "$ref": "#/definitions/payments/definitions/expiry_days"
+            }
+          },
+          "required": [
+            "type",
+            "store",
+            "phone",
+            "email"
+          ]
+        },
+        "konbini_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "konbini"
+              ]
+            },
+            "store": {
+              "enum": [
+                "seven-eleven",
+                "lawson",
+                "family-mart",
+                "sunkus",
+                "circle-k",
+                "ministop",
+                "daily-yamazaki"
+              ]
+            },
+            "instructions_url": {
+              "$ref": "#/definitions/payments/definitions/instructions_url"
+            },
+            "confirmation_code": {
+              "type": [
+                "string"
+              ]
+            },
+            "receipt": {
+              "type": [
+                "string"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "store",
+            "confirmation_code",
+            "receipt",
+            "instructions_url"
+          ]
+        },
+        "pay_easy_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "pay_easy"
+              ]
+            },
+            "email": {
+              "$ref": "#/definitions/payments/definitions/email"
+            },
+            "given_name": {
+              "$ref": "#/definitions/payments/definitions/given_name"
+            },
+            "family_name": {
+              "$ref": "#/definitions/payments/definitions/family_name"
+            },
+            "given_name_kana": {
+              "$ref": "#/definitions/payments/definitions/given_name_kana"
+            },
+            "family_name_kana": {
+              "$ref": "#/definitions/payments/definitions/family_name_kana"
+            },
+            "phone": {
+              "$ref": "#/definitions/payments/definitions/phone"
+            },
+            "expiry_days": {
+              "$ref": "#/definitions/payments/definitions/expiry_days"
+            }
+          },
+          "required": [
+            "type",
+            "given_name",
+            "family_name",
+            "given_name_kana",
+            "family_name_kana",
+            "email",
+            "phone"
+          ]
+        },
+        "pay_easy_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "pay_easy"
+              ]
+            },
+            "email": {
+              "$ref": "#/definitions/payments/definitions/email"
+            },
+            "bank_id": {
+              "type": [
+                "string"
+              ]
+            },
+            "customer_id": {
+              "type": [
+                "string"
+              ]
+            },
+            "confirmation_id": {
+              "type": [
+                "string"
+              ]
+            },
+            "instructions_url": {
+              "$ref": "#/definitions/payments/definitions/instructions_url"
+            }
+          },
+          "required": [
+            "type",
+            "bank_id",
+            "customer_id",
+            "confirmation_id",
+            "instructions_url"
+          ]
+        },
+        "web_money_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "web_money"
+              ]
+            },
+            "prepaid_number": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 16,
+              "minLength": 16
+            }
+          },
+          "required": [
+            "type",
+            "prepaid_number"
+          ]
+        },
+        "web_money_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "web_money"
+              ]
+            },
+            "email": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "email"
+            },
+            "short_amount": {
+              "type": [
+                "integer"
+              ]
+            },
+            "prepaid_cards": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "object"
+                ],
+                "properties": {
+                  "last_four_digits": {
+                    "type": [
+                      "string"
+                    ]
+                  },
+                  "points": {
+                    "type": [
+                      "number"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "credit_card_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "credit_card"
+              ]
+            },
+            "number": {
+              "type": [
+                "string"
+              ]
+            },
+            "month": {
+              "type": [
+                "integer"
+              ]
+            },
+            "year": {
+              "type": [
+                "integer"
+              ]
+            },
+            "verification_value": {
+              "type": [
+                "string"
+              ]
+            },
+            "given_name": {
+              "$ref": "#/definitions/payments/definitions/given_name"
+            },
+            "family_name": {
+              "$ref": "#/definitions/payments/definitions/family_name"
+            },
+            "last_four_digits": {
+              "type": [
+                "string"
+              ]
+            },
+            "brand": {
+              "enum": [
+                "visa",
+                "american_express",
+                "master",
+                "jcb"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "number",
+            "month",
+            "year",
+            "given_name",
+            "family_name"
+          ]
+        },
+        "credit_card_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "credit_card"
+              ]
+            },
+            "month": {
+              "type": [
+                "integer"
+              ]
+            },
+            "year": {
+              "type": [
+                "integer"
+              ]
+            },
+            "last_four_digits": {
+              "type": [
+                "string"
+              ]
+            },
+            "brand": {
+              "enum": [
+                "visa",
+                "american_express",
+                "master",
+                "jcb"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "brand",
+            "last_four_digits",
+            "month",
+            "year"
+          ]
+        },
+        "id": {
+          "example": "94f128d4021b049bc616f5b1b0",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique indentifier for the payment"
+        },
+        "resource": {
+          "example": "payment",
+          "enum": [
+            "payment"
+          ],
+          "description": "Value of `resource`."
+        },
+        "status": {
+          "example": "pending",
+          "enum": [
+            "pending",
+            "authorized",
+            "captured",
+            "expired",
+            "cancelled",
+            "refunded"
+          ],
+          "description": "The status of the payment."
+        },
+        "amount": {
+          "example": "300",
+          "minimum": 0,
+          "type": [
+            "number"
+          ],
+          "description": "The amount to be charged before tax. Must be equal or greater than 0. Use a ‘.’ as a decimal separator, and no thousands separator"
+        },
+        "tax": {
+          "example": "30",
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The amount of tax to be charged, or ‘auto’ to use the current consumption tax rate in Japan. Use a ‘.’ as a decimal separator, and no thousands separator. If the tax is more precise than the currency allows, it will be rounded using a round half up algorithm."
+        },
+        "payment_deadline": {
+          "format": "date-time",
+          "example": "2015-03-09T06:52:34Z",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Time when the payment will expire. This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ."
+        },
+        "payment_method_fee": {
+          "example": "0",
+          "type": [
+            "number"
+          ],
+          "minimum": 0,
+          "description": "An additional fee added to specific payment types"
+        },
+        "total": {
+          "example": "330",
+          "type": [
+            "number"
+          ],
+          "description": "The payment total, this is the amount + tax + payment_method_fee"
+        },
+        "currency": {
+          "example": "JPY",
+          "enum": [
+            "JPY",
+            "USD"
+          ],
+          "description": "3 letter ISO currency code of the transaction"
+        },
+        "description": {
+          "example": "",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the payment (used in e-mail receipts if enabled)."
+        },
+        "subscription": {
+          "example": null,
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Shown if payment was part of a subscription"
+        },
+        "captured_at": {
+          "example": "2015-03-09T06:52:34Z",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when a payment was captured"
+        },
+        "metadata": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "example": {
+            "order_id": "abcdefghijklmn"
+          },
+          "description": "A set of key-value pairs"
+        },
+        "payment_details_request": {
+          "description": "A hash or token describing the payment method used to make the payment.",
+          "example": {
+            "type": [
+              "konbini"
+            ],
+            "store": "lawson",
+            "email": "foo@bar.com",
+            "phone": "08011111111"
+          },
+          "type": [
+            "string",
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "credit_card",
+                "bank_transfer",
+                "konbini",
+                "pay_easy",
+                "web_money"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "payment_details_response": {
+          "description": "A hash or token describing the payment method used to make the payment.",
+          "example": {
+            "type": [
+              "konbini"
+            ],
+            "store": "lawson",
+            "confirmation_code": null,
+            "receipt": "12345"
+          },
+          "oneOf": [
+            {
+              "type": [
+                "null"
+              ]
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/bank_transfer_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/credit_card_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/konbini_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/pay_easy_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/web_money_response"
+            }
+          ]
+        },
+        "fraud_details": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "customer_ip": {
+              "type": [
+                "string"
+              ],
+              "oneOf": [
+                {
+                  "format": "ipv4"
+                },
+                {
+                  "format": "ipv6"
+                }
+              ]
+            },
+            "customer_email": {
+              "format": "email",
+              "type": [
+                "string"
+              ]
+            },
+            "browser_language": {
+              "type": [
+                "string"
+              ]
+            },
+            "browser_user_agent": {
+              "type": [
+                "string"
+              ]
+            }
+          },
+          "dependencies": {
+            "customer_email": [
+              "customer_ip"
+            ],
+            "browser_language": [
+              "customer_ip"
+            ],
+            "browser_user_agent": [
+              "customer_ip"
+            ]
+          },
+          "additionalProperties": false
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when a payment was created"
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List payments",
+          "href": "/payments",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "payments#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a payment",
+          "href": "/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "payments#show",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create a payment",
+          "href": "/payments",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "payments#create",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "amount": {
+                "$ref": "#/definitions/payments/definitions/amount"
+              },
+              "tax": {
+                "$ref": "#/definitions/payments/definitions/tax"
+              },
+              "currency": {
+                "$ref": "#/definitions/payments/definitions/currency"
+              },
+              "external_order_num": {
+                "$ref": "#/definitions/payments/definitions/external_order_num"
+              },
+              "metadata": {
+                "$ref": "#/definitions/payments/definitions/metadata"
+              },
+              "payment_details": {
+                "$ref": "#/definitions/payments/definitions/payment_details_request"
+              },
+              "customer": {
+                "$ref": "#/definitions/payments/definitions/customer"
+              },
+              "fraud_details": {
+                "$ref": "#/definitions/payments/definitions/fraud_details"
+              }
+            },
+            "required": [
+              "amount",
+              "currency"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "title": "Update",
+          "description": "Update a payment",
+          "href": "/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}",
+          "method": "PATCH",
+          "rel": "self",
+          "response_example": "payments#update",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "description": {
+                "$ref": "#/definitions/payments/definitions/description"
+              },
+              "metadata": {
+                "$ref": "#/definitions/payments/definitions/metadata"
+              },
+              "payment_details": {
+                "type": [
+                  "object"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "web_money"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "title": "Refund",
+          "description": "Refund a payment",
+          "href": "/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}/refund",
+          "method": "POST",
+          "rel": "self",
+          "response_example": "payments#refund",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "amount": {
+                "$ref": "#/definitions/payments/definitions/amount"
+              },
+              "description": {
+                "$ref": "#/definitions/payments/definitions/description"
+              }
+            }
+          }
+        },
+        {
+          "title": "Cancel",
+          "description": "Cancel a payment",
+          "href": "/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}/cancel",
+          "method": "POST",
+          "rel": "self",
+          "response_example": "payments#cancel",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/payments/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/payments/definitions/resource"
+        },
+        "status": {
+          "$ref": "#/definitions/payments/definitions/status"
+        },
+        "amount": {
+          "$ref": "#/definitions/payments/definitions/amount"
+        },
+        "tax": {
+          "$ref": "#/definitions/payments/definitions/tax"
+        },
+        "payment_deadline": {
+          "$ref": "#/definitions/payments/definitions/payment_deadline"
+        },
+        "payment_details": {
+          "$ref": "#/definitions/payments/definitions/payment_details_response"
+        },
+        "payment_method_fee": {
+          "$ref": "#/definitions/payments/definitions/payment_method_fee"
+        },
+        "total": {
+          "$ref": "#/definitions/payments/definitions/total"
+        },
+        "currency": {
+          "$ref": "#/definitions/payments/definitions/currency"
+        },
+        "description": {
+          "$ref": "#/definitions/payments/definitions/description"
+        },
+        "subscription": {
+          "$ref": "#/definitions/payments/definitions/subscription"
+        },
+        "captured_at": {
+          "$ref": "#/definitions/payments/definitions/captured_at"
+        },
+        "metadata": {
+          "$ref": "#/definitions/payments/definitions/metadata"
+        },
+        "created_at": {
+          "$ref": "#/definitions/payments/definitions/created_at"
+        },
+        "refunds": {
+          "type": [
+            "array"
+          ]
+        }
+      },
+      "description": "Payment resource",
+      "title": "Payments"
+    },
+    "payouts": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "example": "66a4824ac97cc7afff608f27c7",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for a payout."
+        },
+        "resource": {
+          "example": "event",
+          "readOnly": true,
+          "enum": [
+            "payout"
+          ],
+          "description": "Name of resource"
+        },
+        "payout_item": {
+          "readOnly": true,
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "resource": {
+              "example": "payout_item",
+              "readOnly": true,
+              "enum": [
+                "payout_item"
+              ],
+              "description": "Name of resource."
+            },
+            "event_type": {
+              "example": "capture",
+              "readOnly": true,
+              "enum": [
+                "capture",
+                "refund"
+              ],
+              "description": "Describes whether the payout item is from a captured or refunded payment."
+            },
+            "timestamp": {
+              "example": "2015-03-06T06:52:35Z",
+              "readOnly": true,
+              "format": "date-time",
+              "description": "Timestamp describing when the payment was either captured or refunded."
+            },
+            "payment_method": {
+              "example": "visa",
+              "readOnly": true,
+              "enum": [
+                "visa",
+                "master_card",
+                "american_express",
+                "jcb",
+                "bank_transfer",
+                "web_money",
+                "lawson",
+                "family-mart",
+                "sunkus",
+                "circle-k",
+                "ministop",
+                "daily-yamazaki",
+                "seven-eleven"
+              ],
+              "description": "The payment method of the payment."
+            },
+            "payment_fee": {
+              "example": "300",
+              "type": [
+                "number"
+              ],
+              "description": "Komoju platform fee deducted from the payment total."
+            },
+            "receivable": {
+              "example": "300",
+              "type": [
+                "number"
+              ],
+              "description": "The amount paid to your account for a given payment."
+            },
+            "amount": {
+              "$ref": "#/definitions/payments/definitions/amount"
+            },
+            "tax": {
+              "$ref": "#/definitions/payments/definitions/tax"
+            },
+            "total": {
+              "$ref": "#/definitions/payments/definitions/total"
+            }
+          },
+          "description": "Payout Item Resource"
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the payout was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List payouts",
+          "href": "/payouts",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "payouts#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a payout",
+          "href": "/payouts/{(%2Fdefinitions%2Fpayouts%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "payouts#show",
+          "targetSchema": {
+            "$ref": "#/definitions/payouts/"
+          }
+        },
+        {
+          "title": "Payout Items",
+          "description": "List payout items",
+          "href": "/payouts/{(%2Fdefinitions%2Fpayouts%2Fdefinitions%2Fid)}/payout_items",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "payouts#payout_items",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/payouts/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/payouts/definitions/resource"
+        },
+        "payout_items": {
+          "$ref": "#/definitions/list/"
+        },
+        "created_at": {
+          "$ref": "#/definitions/payouts/definitions/created_at"
+        }
+      },
+      "description": "Payout Resource",
+      "title": "Payouts"
+    },
+    "subscriptions": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "example": "66a4824ac97cc7afff608f27c7",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for a subscription."
+        },
+        "resource": {
+          "example": "subscription",
+          "readOnly": true,
+          "enum": [
+            "subscription"
+          ],
+          "description": "Name of resource"
+        },
+        "status": {
+          "example": "pending",
+          "readOnly": true,
+          "enum": [
+            "cancelled",
+            "pending",
+            "active",
+            "past_due"
+          ],
+          "description": "The status of the subscription."
+        },
+        "plan": {
+          "$ref": "#/definitions/plans"
+        },
+        "customer": {
+          "$ref": "#/definitions/customers"
+        },
+        "current_period_end_at": {
+          "example": null,
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the subscription will next be billed."
+        },
+        "cancel_at_period_end": {
+          "type": [
+            "boolean"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/payments/definitions/metadata"
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the plan was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List subscriptions",
+          "href": "/subscriptions",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "subscriptions#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a subscription",
+          "href": "/subscriptions/{(%2Fdefinitions%2Fsubscriptions%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "subscriptions#show",
+          "targetSchema": {
+            "$ref": "#/definitions/subscriptions/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create a subscription",
+          "href": "/subscriptions",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "subscriptions#create",
+          "targetSchema": {
+            "$ref": "#/definitions/subscriptions/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "customer": {
+                "type": [
+                  "string"
+                ]
+              },
+              "plan": {
+                "type": [
+                  "string"
+                ]
+              },
+              "metadata": {
+                "$ref": "#/definitions/subscriptions/definitions/metadata"
+              }
+            },
+            "required": [
+              "customer",
+              "plan"
+            ]
+          }
+        },
+        {
+          "title": "Delete",
+          "description": "Delete a subscription",
+          "href": "/subscriptions/{(%2Fdefinitions%2Fsubscriptions%2Fdefinitions%2Fid)}",
+          "method": "DELETE",
+          "rel": "destroy",
+          "response_example": "subscriptions#destroy",
+          "targetSchema": {
+            "$ref": "#/definitions/subscriptions/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/subscriptions/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/subscriptions/definitions/resource"
+        },
+        "status": {
+          "$ref": "#/definitions/subscriptions/definitions/status"
+        },
+        "plan": {
+          "$ref": "#/definitions/subscriptions/definitions/plan"
+        },
+        "customer": {
+          "$ref": "#/definitions/subscriptions/definitions/customer"
+        },
+        "current_period_end_at": {
+          "$ref": "#/definitions/subscriptions/definitions/current_period_end_at"
+        },
+        "metadata": {
+          "$ref": "#/definitions/subscriptions/definitions/metadata"
+        },
+        "created_at": {
+          "$ref": "#/definitions/subscriptions/definitions/created_at"
+        }
+      },
+      "description": "Subscription Resource",
+      "title": "Subscriptions"
+    },
+    "customers": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "example": "fa799fca14be29d3fae455f22d",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for the customer."
+        },
+        "resource": {
+          "example": "customer",
+          "readOnly": true,
+          "enum": [
+            "customer"
+          ],
+          "description": "Name of resource"
+        },
+        "currency": {
+          "readOnly": true,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "payment_details": {
+          "$ref": "#/definitions/payments/definitions/payment_details_response"
+        },
+        "metadata": {
+          "$ref": "#/definitions/payments/definitions/metadata"
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "email",
+          "description": "Customer's email address."
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the customer was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List customers",
+          "href": "/customers",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "customers#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a customer",
+          "href": "/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "customers#show",
+          "targetSchema": {
+            "$ref": "#/definitions/customers/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create a customer",
+          "href": "/customers",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "customers#create",
+          "targetSchema": {
+            "$ref": "#/definitions/customers/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "payment_details": {
+                "$ref": "#/definitions/payments/definitions/payment_details_request"
+              },
+              "email": {
+                "$ref": "#/definitions/customers/definitions/email"
+              },
+              "metadata": {
+                "$ref": "#/definitions/customers/definitions/metadata"
+              }
+            },
+            "additionalFields": false
+          }
+        },
+        {
+          "title": "Update",
+          "description": "Update customers",
+          "href": "/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}",
+          "method": "PATCH",
+          "rel": "self",
+          "response_example": "customers#update",
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "payment_details": {
+                "$ref": "#/definitions/payments/definitions/payment_details_request"
+              },
+              "currency": {
+                "$ref": "#/definitions/payments/definitions/currency"
+              },
+              "email": {
+                "$ref": "#/definitions/customers/definitions/email"
+              },
+              "metadata": {
+                "$ref": "#/definitions/customers/definitions/metadata"
+              }
+            },
+            "additionalFields": false
+          },
+          "targetSchema": {
+            "$ref": "#/definitions/customers/"
+          }
+        },
+        {
+          "title": "Delete",
+          "description": "Delete a customer",
+          "href": "/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}",
+          "method": "DELETE",
+          "rel": "destroy",
+          "response_example": "customers#destroy",
+          "targetSchema": {
+            "$ref": "#/definitions/customers/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/customers/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/customers/definitions/resource"
+        },
+        "currency": {
+          "$ref": "#/definitions/customers/definitions/currency"
+        },
+        "email": {
+          "$ref": "#/definitions/customers/definitions/email"
+        },
+        "metadata": {
+          "$ref": "#/definitions/customers/definitions/metadata"
+        },
+        "created_at": {
+          "$ref": "#/definitions/customers/definitions/created_at"
+        }
+      },
+      "description": "Customers",
+      "title": "Customers"
+    },
+    "invoices": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for the invoice."
+        },
+        "resource": {
+          "example": "invoice",
+          "readOnly": true,
+          "enum": [
+            "invoice"
+          ],
+          "description": "Name of resource."
+        },
+        "invoice": {
+          "readOnly": true,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "paid": {
+          "readOnly": true,
+          "type": [
+            "boolean"
+          ]
+        },
+        "created_at": {
+          "readOnly": true,
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the invoice was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List invoices",
+          "href": "/invoices",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "invoices#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show an invoice",
+          "href": "/invoices/{(%2Fdefinitions%2Finvoices%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "invoices#show",
+          "targetSchema": {
+            "$ref": "#/definitions/invoices/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create an invoice",
+          "href": "/invoices",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "invoices#create",
+          "targetSchema": {
+            "$ref": "#/definitions/invoices/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "subscription": {
+                "$ref": "#/definitions/subscriptions/definitions/id"
+              },
+              "metadata": {
+                "$ref": "#/definitions/subscriptions/definitions/metadata"
+              }
+            },
+            "required": [
+              "subscription"
+            ]
+          }
+        },
+        {
+          "title": "Preview",
+          "description": "Preview an upcoming invoice",
+          "href": "/invoices/preview",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "invoices#preview",
+          "targetSchema": {
+            "$ref": "#/definitions/invoices/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "customer": {
+                "$ref": "#/definitions/customers/definitions/id"
+              },
+              "subscription": {
+                "$ref": "#/definitions/subscriptions/definitions/id"
+              }
+            },
+            "required": [
+              "customer"
+            ]
+          }
+        },
+        {
+          "title": "Pay",
+          "description": "Pay an invoice",
+          "href": "/invoices/{(%2Fdefinitions%2Finvoices%2Fdefinitions%2Fid)}/pay",
+          "method": "POST",
+          "rel": "self",
+          "response_example": "invoices#pay",
+          "targetSchema": {
+            "$ref": "#/definitions/invoices/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "payment_details": {
+                "$ref": "#/definitions/payments/definitions/payment_details_request"
+              },
+              "fraud_details": {
+                "$ref": "#/definitions/payments/definitions/fraud_details"
+              }
+            },
+            "required": [
+              "payment_details"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/payments/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/invoices/definitions/resource"
+        },
+        "subscription": {
+          "$ref": "#/definitions/subscriptions"
+        },
+        "paid": {
+          "$ref": "#/definitions/invoices/definitions/paid"
+        },
+        "invoice_items": {
+          "$ref": "#/definitions/list/"
+        },
+        "total": {
+          "$ref": "#/definitions/payments/definitions/total"
+        },
+        "currency": {
+          "$ref": "#/definitions/payments/definitions/currency"
+        },
+        "created_at": {
+          "$ref": "#/definitions/invoices/definitions/created_at"
+        }
+      },
+      "description": "Subscription Invoice",
+      "title": "Invoices"
+    },
+    "invoice_items": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for the invoice items."
+        },
+        "resource": {
+          "example": "invoice_item",
+          "readOnly": true,
+          "enum": [
+            "invoice_item"
+          ],
+          "description": "Name of resource"
+        },
+        "type": {
+          "example": "invoice_item",
+          "readOnly": true,
+          "enum": [
+            "invoice_item",
+            "plan"
+          ]
+        },
+        "plan": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/plans/"
+            },
+            {
+              "type": [
+                "null"
+              ]
+            }
+          ]
+        },
+        "invoice": {
+          "readOnly": true,
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List invoice items",
+          "href": "/invoice_items",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "invoice_items#index",
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "customer": {
+                "$ref": "#/definitions/customers/definitions/id"
+              }
+            }
+          },
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show an invoice item",
+          "href": "/invoice_items/{(%2Fdefinitions%2Finvoice_items%2Fdefinitions%2Fid)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "invoice_items#show",
+          "targetSchema": {
+            "$ref": "#/definitions/invoice_items/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create an invoice item",
+          "href": "/invoice_items",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "invoice_items#create",
+          "targetSchema": {
+            "$ref": "#/definitions/invoice_items/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "amount": {
+                "$ref": "#/definitions/invoice_items/properties/amount"
+              },
+              "currency": {
+                "$ref": "#/definitions/invoice_items/properties/currency"
+              },
+              "customer": {
+                "$ref": "#/definitions/invoice_items/properties/customer"
+              },
+              "metadata": {
+                "$ref": "#/definitions/invoice_items/properties/metadata"
+              }
+            },
+            "required": [
+              "amount",
+              "currency",
+              "customer"
+            ]
+          }
+        },
+        {
+          "title": "Destroy",
+          "description": "Deletes an invoice item from the upcoming invoice.",
+          "href": "/invoice_items/{(%2Fdefinitions%2Finvoice_items%2Fdefinitions%2Fid)}",
+          "method": "DELETE",
+          "rel": "destroy",
+          "response_example": "invoice_items#destroy",
+          "targetSchema": {
+            "$ref": "#/definitions/invoice_items/"
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/payments/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/invoice_items/definitions/resource"
+        },
+        "type": {
+          "$ref": "#/definitions/invoice_items/definitions/type"
+        },
+        "amount": {
+          "$ref": "#/definitions/payments/definitions/amount"
+        },
+        "currency": {
+          "$ref": "#/definitions/payments/definitions/currency"
+        },
+        "customer": {
+          "$ref": "#/definitions/customers/definitions/id"
+        },
+        "invoice": {
+          "$ref": "#/definitions/invoice_items/definitions/invoice"
+        },
+        "plan": {
+          "$ref": "#/definitions/invoice_items/definitions/plan"
+        },
+        "metadata": {
+          "$ref": "#/definitions/payments/definitions/metadata"
+        }
+      },
+      "required": [
+        "id",
+        "resource",
+        "type",
+        "amount",
+        "customer",
+        "currency",
+        "invoice",
+        "metadata",
+        "plan"
+      ],
+      "description": "Subscription Invoice Items",
+      "title": "Invoice Items"
+    },
+    "plans": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "name": {
+          "example": "name2",
+          "type": [
+            "string"
+          ],
+          "description": "Name of the plan."
+        },
+        "resource": {
+          "example": "plan",
+          "enum": [
+            "plan"
+          ],
+          "description": "Name of resource"
+        },
+        "interval": {
+          "example": "month",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "description": "The billing frequency of a subscription."
+        },
+        "interval_count": {
+          "example": "1",
+          "type": [
+            "integer"
+          ],
+          "minimum": 1,
+          "description": "The number of intervals before the end of each billing period. For example, `interval=month` and `interval_count=3` would bill every 3 months."
+        },
+        "amount": {
+          "$ref": "#/definitions/payments/definitions/amount"
+        },
+        "tax_percent": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "currency": {
+          "$ref": "#/definitions/payments/definitions/currency"
+        },
+        "metadata": {
+          "$ref": "#/definitions/payments/definitions/metadata"
+        },
+        "renewal_notice_days": {
+          "example": 1,
+          "type": [
+            "integer"
+          ],
+          "minimum": 0
+        },
+        "trial_period_days": {
+          "type": [
+            "integer"
+          ],
+          "minimum": 1
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the plan was created."
+        }
+      },
+      "links": [
+        {
+          "title": "List",
+          "description": "List plans",
+          "href": "/plans",
+          "method": "GET",
+          "rel": "instances",
+          "response_example": "plans#index",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          }
+        },
+        {
+          "title": "Show",
+          "description": "Show a plan",
+          "href": "/plans/{(%2Fdefinitions%2Fplans%2Fdefinitions%2Fname)}",
+          "method": "GET",
+          "rel": "self",
+          "response_example": "plans#show",
+          "targetSchema": {
+            "$ref": "#/definitions/plans/"
+          }
+        },
+        {
+          "title": "Create",
+          "description": "Create a plan",
+          "href": "/plans",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "plans#create",
+          "targetSchema": {
+            "$ref": "#/definitions/plans/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/plans/definitions/name"
+              },
+              "interval": {
+                "$ref": "#/definitions/plans/definitions/interval"
+              },
+              "interval_count": {
+                "$ref": "#/definitions/plans/definitions/interval_count"
+              },
+              "amount": {
+                "$ref": "#/definitions/plans/definitions/amount"
+              },
+              "tax_percent": {
+                "$ref": "#/definitions/plans/definitions/tax_percent"
+              },
+              "currency": {
+                "$ref": "#/definitions/plans/definitions/currency"
+              },
+              "renewal_notice_days": {
+                "$ref": "#/definitions/plans/definitions/renewal_notice_days"
+              },
+              "trial_period_days": {
+                "$ref": "#/definitions/plans/definitions/trial_period_days"
+              },
+              "metadata": {
+                "$ref": "#/definitions/plans/definitions/metadata"
+              }
+            },
+            "required": [
+              "name",
+              "interval",
+              "amount",
+              "currency"
+            ]
+          }
+        },
+        {
+          "title": "Delete",
+          "description": "Delete a plan",
+          "href": "/plans/{(%2Fdefinitions%2Fplans%2Fdefinitions%2Fname)}",
+          "method": "DELETE",
+          "rel": "destroy",
+          "response_example": "plans#destroy",
+          "targetSchema": {
+            "$ref": "#/definitions/plans/"
+          }
+        }
+      ],
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/plans/definitions/resource"
+        },
+        "name": {
+          "$ref": "#/definitions/plans/definitions/name"
+        },
+        "interval": {
+          "$ref": "#/definitions/plans/definitions/interval"
+        },
+        "interval_count": {
+          "$ref": "#/definitions/plans/definitions/interval_count"
+        },
+        "currency": {
+          "$ref": "#/definitions/plans/definitions/currency"
+        },
+        "amount": {
+          "$ref": "#/definitions/plans/definitions/amount"
+        },
+        "tax_percent": {
+          "$ref": "#/definitions/plans/definitions/tax_percent"
+        },
+        "renewal_notice_days": {
+          "$ref": "#/definitions/plans/definitions/renewal_notice_days"
+        },
+        "metadata": {
+          "$ref": "#/definitions/plans/definitions/metadata"
+        },
+        "created_at": {
+          "$ref": "#/definitions/plans/definitions/created_at"
+        }
+      },
+      "description": "Subscription Plans",
+      "title": "Plans"
+    },
+    "tokens": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "id": {
+          "example": "tok_ed4119a0f69bc365286d5a9a8777f33cee024f19d532454e6abffccc42cf1452b6ad214de6b8e876cabc60ae6f",
+          "readOnly": true,
+          "type": [
+            "string"
+          ],
+          "description": "A unique identifier for the token."
+        },
+        "resource": {
+          "example": "token",
+          "enum": [
+            "token"
+          ],
+          "description": "Name of resource"
+        },
+        "payment_details": {
+          "$ref": "#/definitions/payments/definitions/payment_details_response"
+        },
+        "created_at": {
+          "example": "2015-03-06T06:52:35Z",
+          "format": "date-time",
+          "type": [
+            "string"
+          ],
+          "description": "An ISO 8601 formatted timestamp of when the token was created."
+        }
+      },
+      "links": [
+        {
+          "title": "Create",
+          "description": "Create a token",
+          "href": "/tokens",
+          "method": "POST",
+          "rel": "create",
+          "response_example": "tokens#create",
+          "targetSchema": {
+            "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "payment_details": {
+                "$ref": "#/definitions/payments/definitions/payment_details_request"
+              }
+            },
+            "required": [
+              "payment_details"
+            ],
+            "additionalFields": false
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/tokens/definitions/id"
+        },
+        "resource": {
+          "$ref": "#/definitions/tokens/definitions/resource"
+        },
+        "created_at": {
+          "$ref": "#/definitions/tokens/definitions/created_at"
+        }
+      },
+      "description": "Token resource",
+      "title": "Tokens"
+    }
+  },
+  "properties": {
+    "events": {
+      "$ref": "#/definitions/events"
+    },
+    "payments": {
+      "$ref": "#/definitions/payments"
+    },
+    "payouts": {
+      "$ref": "#/definitions/payouts"
+    },
+    "subscriptions": {
+      "$ref": "#/definitions/subscriptions"
+    },
+    "customers": {
+      "$ref": "#/definitions/customers"
+    },
+    "invoices": {
+      "$ref": "#/definitions/invoices"
+    },
+    "invoice_items": {
+      "$ref": "#/definitions/invoice_items"
+    },
+    "plans": {
+      "$ref": "#/definitions/plans"
+    },
+    "tokens": {
+      "$ref": "#/definitions/tokens"
+    }
+  },
+  "type": [
+    "object"
+  ],
+  "id": "komoju",
+  "links": [
+    {
+      "href": "https://komoju.com/api/v1",
+      "rel": "self"
+    }
+  ],
+  "description": "Komoju API auto-generated JSON Schema",
+  "title": "Komoju API"
+}
 HEROICS_SCHEMA
 end
