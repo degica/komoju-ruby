@@ -1,24 +1,24 @@
 PATH
   remote: .
   specs:
-    komoju (0.0.3)
-      erubis (~> 2.0)
-      excon
+    komoju (0.0.6)
+      heroics (= 0.0.21)
       moneta
-      multi_json (>= 1.9.2)
-      netrc
 
 GEM
   remote: https://rubygems.org/
   specs:
     ansi (1.5.0)
     erubis (2.7.0)
-    excon (0.45.4)
+    excon (0.55.0)
+    heroics (0.0.21)
+      erubis (~> 2.0)
+      excon
+      multi_json (>= 1.9.2)
     minitest (4.7.5)
-    moneta (0.8.0)
-    multi_json (1.11.2)
-    netrc (0.11.0)
-    rake (10.4.2)
+    moneta (1.0.0)
+    multi_json (1.12.1)
+    rake (10.5.0)
     turn (0.9.7)
       ansi
       minitest (~> 4)
@@ -32,3 +32,6 @@ DEPENDENCIES
   minitest (= 4.7.5)
   rake (~> 10.0)
   turn
+
+BUNDLED WITH
+   1.13.7
