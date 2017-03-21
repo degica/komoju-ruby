@@ -7,5 +7,9 @@ schema_url = "https://komoju.com/api/v1/schema.json"
 schema = Heroics.download_schema(schema_url, {})
 endpoint_url = "https://komoju.com/api/v1"
 
-client = Heroics.generate_client("Komoju", schema, endpoint_url, {})
+Heroics::Configuration.defaults.module_name = "Komoju"
+Heroics::Configuration.defaults.schema = schema
+Heroics::Configuration.defaults.base_url = endpoint_url
+
+client = Heroics.generate_client
 File.write(File.join(File.dirname(__FILE__), "../lib/komoju/client.rb"), client)

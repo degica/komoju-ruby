@@ -1,5 +1,6 @@
 require 'komoju/version'
 require 'komoju/client'
+require 'moneta'
 
 module Komoju
   def self.connect(api_key, options=nil)
