@@ -186,8 +186,9 @@ module Komoju
     # List payments
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.payments.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.payments.list(collection_options, body)
     end
 
     # Show a payment
@@ -210,6 +211,13 @@ module Komoju
     # @param body: the object to pass as the request payload
     def update(payments_id, body)
       @client.payments.update(payments_id, body)
+    end
+
+    # Capture a payment
+    #
+    # @param payments_id: A unique indentifier for the payment
+    def capture(payments_id)
+      @client.payments.capture(payments_id)
     end
 
     # Refund a payment
@@ -237,8 +245,9 @@ module Komoju
     # List payouts
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.payouts.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.payouts.list(collection_options, body)
     end
 
     # Show a payout
@@ -266,8 +275,9 @@ module Komoju
     # List subscriptions
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.subscriptions.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.subscriptions.list(collection_options, body)
     end
 
     # Show a subscription
@@ -284,11 +294,12 @@ module Komoju
       @client.subscriptions.create(body)
     end
 
-    # Delete a subscription
+    # Destroy a subscription
     #
     # @param subscriptions_id: A unique identifier for a subscription.
-    def delete(subscriptions_id)
-      @client.subscriptions.delete(subscriptions_id)
+    # @param body: the object to pass as the request payload
+    def destroy(subscriptions_id, body)
+      @client.subscriptions.destroy(subscriptions_id, body)
     end
   end
 
@@ -301,8 +312,9 @@ module Komoju
     # List customers
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.customers.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.customers.list(collection_options, body)
     end
 
     # Show a customer
@@ -327,11 +339,11 @@ module Komoju
       @client.customers.update(customers_id, body)
     end
 
-    # Delete a customer
+    # Destroy a customer
     #
     # @param customers_id: A unique identifier for the customer.
-    def delete(customers_id)
-      @client.customers.delete(customers_id)
+    def destroy(customers_id)
+      @client.customers.destroy(customers_id)
     end
   end
 
@@ -344,8 +356,9 @@ module Komoju
     # List invoices
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.invoices.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.invoices.list(collection_options, body)
     end
 
     # Show an invoice
@@ -353,6 +366,13 @@ module Komoju
     # @param invoices_id: A unique identifier for the invoice.
     def show(invoices_id)
       @client.invoices.show(invoices_id)
+    end
+
+    # Cancel an invoice
+    #
+    # @param invoices_id: A unique identifier for the invoice.
+    def cancel(invoices_id)
+      @client.invoices.cancel(invoices_id)
     end
 
     # Create an invoice
@@ -423,8 +443,9 @@ module Komoju
     # List plans
     #
     # @param collection_options: additional collection options to pass with the request
-    def list(collection_options = {})
-      @client.plans.list(collection_options)
+    # @param body: the object to pass as the request payload
+    def list(collection_options = {}, body)
+      @client.plans.list(collection_options, body)
     end
 
     # Show a plan
@@ -441,11 +462,11 @@ module Komoju
       @client.plans.create(body)
     end
 
-    # Delete a plan
+    # Destroy a plan
     #
     # @param plans_name: Name of the plan.
-    def delete(plans_name)
-      @client.plans.delete(plans_name)
+    def destroy(plans_name)
+      @client.plans.destroy(plans_name)
     end
   end
 
@@ -467,6 +488,35 @@ module Komoju
 {
   "$schema": "http://json-schema.org/draft-04/hyper-schema",
   "definitions": {
+    "list_filter": {
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "start_time": {
+          "type": [
+            "string"
+          ],
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": [
+            "string"
+          ],
+          "format": "date-time"
+        },
+        "per_page": {
+          "type": [
+            "number"
+          ]
+        },
+        "page": {
+          "type": [
+            "number"
+          ]
+        }
+      }
+    },
     "list": {
       "type": [
         "object"
@@ -679,6 +729,13 @@ module Komoju
         "object"
       ],
       "definitions": {
+        "capture": {
+          "type": [
+            "boolean"
+          ],
+          "default": true,
+          "description": "If true, the payment will be immediately captured. This option is ignored if a payment type is not credit_card"
+        },
         "given_name": {
           "type": [
             "string"
@@ -704,6 +761,19 @@ module Komoju
             "string"
           ],
           "format": "email"
+        },
+        "locale": {
+          "enum": [
+            "en",
+            "ja",
+            "ko"
+          ],
+          "default": "ja"
+        },
+        "partner_origin": {
+          "type": [
+            "string"
+          ]
         },
         "phone": {
           "type": [
@@ -804,7 +874,7 @@ module Komoju
             },
             "account_number": {
               "type": [
-                "integer"
+                "string"
               ]
             },
             "account_type": {
@@ -866,7 +936,6 @@ module Komoju
           "required": [
             "type",
             "store",
-            "phone",
             "email"
           ]
         },
@@ -896,7 +965,8 @@ module Komoju
             },
             "confirmation_code": {
               "type": [
-                "string"
+                "string",
+                "null"
               ]
             },
             "receipt": {
@@ -1066,6 +1136,273 @@ module Komoju
           },
           "additionalProperties": false
         },
+        "bit_cash_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "bit_cash"
+              ]
+            },
+            "prepaid_number": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "type",
+            "prepaid_number"
+          ]
+        },
+        "bit_cash_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "bit_cash"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "nanaco_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "nanaco"
+              ]
+            },
+            "prepaid_number": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 16,
+              "minLength": 16
+            }
+          },
+          "required": [
+            "type",
+            "prepaid_number"
+          ]
+        },
+        "nanaco_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "nanaco"
+              ]
+            },
+            "email": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "email"
+            },
+            "short_amount": {
+              "type": [
+                "integer"
+              ]
+            },
+            "prepaid_cards": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "object"
+                ],
+                "properties": {
+                  "last_four_digits": {
+                    "type": [
+                      "string"
+                    ]
+                  },
+                  "points": {
+                    "type": [
+                      "number"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "net_cash_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "net_cash"
+              ]
+            },
+            "prepaid_number": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 16,
+              "minLength": 16
+            }
+          },
+          "required": [
+            "type",
+            "prepaid_number"
+          ]
+        },
+        "net_cash_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "net_cash"
+              ]
+            },
+            "email": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "email"
+            },
+            "short_amount": {
+              "type": [
+                "integer"
+              ]
+            },
+            "prepaid_cards": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "object"
+                ],
+                "properties": {
+                  "last_four_digits": {
+                    "type": [
+                      "string"
+                    ]
+                  },
+                  "points": {
+                    "type": [
+                      "number"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "culture_voucher_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "culture_voucher"
+              ]
+            },
+            "culture_id": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 12
+            },
+            "culture_password": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 12
+            }
+          },
+          "required": [
+            "type",
+            "culture_id",
+            "culture_password"
+          ]
+        },
+        "culture_voucher_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "culture_voucher"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "dospara_request": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "dospara"
+              ]
+            },
+            "user_no": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 20
+            },
+            "user_password": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 20
+            }
+          },
+          "required": [
+            "type",
+            "user_no",
+            "user_password"
+          ]
+        },
+        "dospara_response": {
+          "type": [
+            "object"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "dospara"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
         "credit_card_request": {
           "type": [
             "object"
@@ -1112,7 +1449,8 @@ module Komoju
                 "visa",
                 "american_express",
                 "master",
-                "jcb"
+                "jcb",
+                "diners_club"
               ]
             }
           },
@@ -1157,6 +1495,9 @@ module Komoju
                 "master",
                 "jcb"
               ]
+            },
+            "expiry_days": {
+              "$ref": "#/definitions/payments/definitions/expiry_days"
             }
           },
           "required": [
@@ -1238,7 +1579,10 @@ module Komoju
           "example": "JPY",
           "enum": [
             "JPY",
-            "USD"
+            "USD",
+            "EUR",
+            "TWD",
+            "KRW"
           ],
           "description": "3 letter ISO currency code of the transaction"
         },
@@ -1297,7 +1641,12 @@ module Komoju
                 "bank_transfer",
                 "konbini",
                 "pay_easy",
-                "web_money"
+                "web_money",
+                "bit_cash",
+                "nanaco",
+                "net_cash",
+                "culture_voucher",
+                "dospara"
               ]
             }
           },
@@ -1335,6 +1684,18 @@ module Komoju
             },
             {
               "$ref": "#/definitions/payments/definitions/web_money_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/bit_cash_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/nanaco_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/culture_voucher_response"
+            },
+            {
+              "$ref": "#/definitions/payments/definitions/net_cash_response"
             }
           ]
         },
@@ -1359,6 +1720,11 @@ module Komoju
             },
             "customer_email": {
               "format": "email",
+              "type": [
+                "string"
+              ]
+            },
+            "customer_id": {
               "type": [
                 "string"
               ]
@@ -1406,6 +1772,9 @@ module Komoju
           "response_example": "payments#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -1437,6 +1806,9 @@ module Komoju
               "amount": {
                 "$ref": "#/definitions/payments/definitions/amount"
               },
+              "capture": {
+                "$ref": "#/definitions/payments/definitions/capture"
+              },
               "tax": {
                 "$ref": "#/definitions/payments/definitions/tax"
               },
@@ -1445,6 +1817,12 @@ module Komoju
               },
               "external_order_num": {
                 "$ref": "#/definitions/payments/definitions/external_order_num"
+              },
+              "locale": {
+                "$ref": "#/definitions/payments/definitions/locale"
+              },
+              "partner_origin": {
+                "$ref": "#/definitions/payments/definitions/partner_origin"
               },
               "metadata": {
                 "$ref": "#/definitions/payments/definitions/metadata"
@@ -1494,7 +1872,9 @@ module Komoju
                 "properties": {
                   "type": {
                     "enum": [
-                      "web_money"
+                      "web_money",
+                      "net_cash",
+                      "nanaco"
                     ]
                   }
                 },
@@ -1504,6 +1884,17 @@ module Komoju
               }
             },
             "additionalProperties": false
+          }
+        },
+        {
+          "title": "Capture",
+          "description": "Capture a payment",
+          "href": "/payments/{(%2Fdefinitions%2Fpayments%2Fdefinitions%2Fid)}/capture",
+          "method": "POST",
+          "rel": "self",
+          "response_example": "payments#capture",
+          "targetSchema": {
+            "$ref": "#/definitions/payments/"
           }
         },
         {
@@ -1714,6 +2105,9 @@ module Komoju
           "response_example": "payouts#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -1805,10 +2199,12 @@ module Komoju
           ],
           "description": "An ISO 8601 formatted timestamp of when the subscription will next be billed."
         },
-        "cancel_at_period_end": {
+        "cancel_later": {
           "type": [
             "boolean"
-          ]
+          ],
+          "default": true,
+          "description": "Cancel the subscription at the end of the current billing period (default: true)"
         },
         "metadata": {
           "$ref": "#/definitions/payments/definitions/metadata"
@@ -1833,6 +2229,9 @@ module Komoju
           "response_example": "subscriptions#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -1882,14 +2281,24 @@ module Komoju
           }
         },
         {
-          "title": "Delete",
-          "description": "Delete a subscription",
+          "title": "Destroy",
+          "description": "Destroy a subscription",
           "href": "/subscriptions/{(%2Fdefinitions%2Fsubscriptions%2Fdefinitions%2Fid)}",
           "method": "DELETE",
           "rel": "destroy",
           "response_example": "subscriptions#destroy",
           "targetSchema": {
             "$ref": "#/definitions/subscriptions/"
+          },
+          "schema": {
+            "type": [
+              "object"
+            ],
+            "properties": {
+              "cancel_later": {
+                "$ref": "#/definitions/subscriptions/definitions/cancel_later"
+              }
+            }
           }
         }
       ],
@@ -1909,8 +2318,8 @@ module Komoju
         "customer": {
           "$ref": "#/definitions/subscriptions/definitions/customer"
         },
-        "current_period_end_at": {
-          "$ref": "#/definitions/subscriptions/definitions/current_period_end_at"
+        "cancel_later": {
+          "$ref": "#/definitions/subscriptions/definitions/cancel_later"
         },
         "metadata": {
           "$ref": "#/definitions/subscriptions/definitions/metadata"
@@ -1943,13 +2352,6 @@ module Komoju
             "customer"
           ],
           "description": "Name of resource"
-        },
-        "currency": {
-          "readOnly": true,
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "payment_details": {
           "$ref": "#/definitions/payments/definitions/payment_details_response"
@@ -1985,6 +2387,9 @@ module Komoju
           "response_example": "customers#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -2041,9 +2446,6 @@ module Komoju
               "payment_details": {
                 "$ref": "#/definitions/payments/definitions/payment_details_request"
               },
-              "currency": {
-                "$ref": "#/definitions/payments/definitions/currency"
-              },
               "email": {
                 "$ref": "#/definitions/customers/definitions/email"
               },
@@ -2058,8 +2460,8 @@ module Komoju
           }
         },
         {
-          "title": "Delete",
-          "description": "Delete a customer",
+          "title": "Destroy",
+          "description": "Destroy a customer",
           "href": "/customers/{(%2Fdefinitions%2Fcustomers%2Fdefinitions%2Fid)}",
           "method": "DELETE",
           "rel": "destroy",
@@ -2075,9 +2477,6 @@ module Komoju
         },
         "resource": {
           "$ref": "#/definitions/customers/definitions/resource"
-        },
-        "currency": {
-          "$ref": "#/definitions/customers/definitions/currency"
         },
         "email": {
           "$ref": "#/definitions/customers/definitions/email"
@@ -2120,6 +2519,13 @@ module Komoju
             "null"
           ]
         },
+        "renewal": {
+          "type": [
+            "boolean"
+          ],
+          "default": true,
+          "description": "Include the upcoming renewal charge (default: true)"
+        },
         "paid": {
           "readOnly": true,
           "type": [
@@ -2146,6 +2552,9 @@ module Komoju
           "response_example": "invoices#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -2155,6 +2564,17 @@ module Komoju
           "method": "GET",
           "rel": "self",
           "response_example": "invoices#show",
+          "targetSchema": {
+            "$ref": "#/definitions/invoices/"
+          }
+        },
+        {
+          "title": "Cancel",
+          "description": "Cancel an invoice",
+          "href": "/invoices/{(%2Fdefinitions%2Finvoices%2Fdefinitions%2Fid)}/cancel",
+          "method": "POST",
+          "rel": "self",
+          "response_example": "invoices#cancel",
           "targetSchema": {
             "$ref": "#/definitions/invoices/"
           }
@@ -2201,15 +2621,15 @@ module Komoju
               "object"
             ],
             "properties": {
-              "customer": {
-                "$ref": "#/definitions/customers/definitions/id"
-              },
               "subscription": {
                 "$ref": "#/definitions/subscriptions/definitions/id"
+              },
+              "renewal": {
+                "$ref": "#/definitions/invoices/definitions/renewal"
               }
             },
             "required": [
-              "customer"
+              "subscription"
             ]
           }
         },
@@ -2250,6 +2670,9 @@ module Komoju
         },
         "subscription": {
           "$ref": "#/definitions/subscriptions"
+        },
+        "renewal": {
+          "$ref": "#/definitions/invoices/definitions/renewal"
         },
         "paid": {
           "$ref": "#/definitions/invoices/definitions/paid"
@@ -2328,14 +2751,21 @@ module Komoju
           "rel": "instances",
           "response_example": "invoice_items#index",
           "schema": {
-            "type": [
-              "object"
-            ],
-            "properties": {
-              "customer": {
-                "$ref": "#/definitions/customers/definitions/id"
+            "allOf": [
+              {
+                "type": [
+                  "object"
+                ],
+                "properties": {
+                  "subscription": {
+                    "$ref": "#/definitions/subscriptions/definitions/id"
+                  }
+                }
+              },
+              {
+                "$ref": "#/definitions/list_filter/"
               }
-            }
+            ]
           },
           "targetSchema": {
             "$ref": "#/definitions/list/"
@@ -2370,11 +2800,8 @@ module Komoju
               "amount": {
                 "$ref": "#/definitions/invoice_items/properties/amount"
               },
-              "currency": {
-                "$ref": "#/definitions/invoice_items/properties/currency"
-              },
-              "customer": {
-                "$ref": "#/definitions/invoice_items/properties/customer"
+              "subscription": {
+                "$ref": "#/definitions/invoice_items/properties/subscription"
               },
               "metadata": {
                 "$ref": "#/definitions/invoice_items/properties/metadata"
@@ -2382,8 +2809,7 @@ module Komoju
             },
             "required": [
               "amount",
-              "currency",
-              "customer"
+              "subscription"
             ]
           }
         },
@@ -2412,17 +2838,14 @@ module Komoju
         "amount": {
           "$ref": "#/definitions/payments/definitions/amount"
         },
-        "currency": {
-          "$ref": "#/definitions/payments/definitions/currency"
-        },
-        "customer": {
-          "$ref": "#/definitions/customers/definitions/id"
-        },
         "invoice": {
           "$ref": "#/definitions/invoice_items/definitions/invoice"
         },
         "plan": {
           "$ref": "#/definitions/invoice_items/definitions/plan"
+        },
+        "subscription": {
+          "$ref": "#/definitions/subscriptions/definitions/id"
         },
         "metadata": {
           "$ref": "#/definitions/payments/definitions/metadata"
@@ -2435,6 +2858,7 @@ module Komoju
         "amount",
         "customer",
         "currency",
+        "subscription",
         "invoice",
         "metadata",
         "plan"
@@ -2528,6 +2952,9 @@ module Komoju
           "response_example": "plans#index",
           "targetSchema": {
             "$ref": "#/definitions/list/"
+          },
+          "schema": {
+            "$ref": "#/definitions/list_filter/"
           }
         },
         {
@@ -2593,8 +3020,8 @@ module Komoju
           }
         },
         {
-          "title": "Delete",
-          "description": "Delete a plan",
+          "title": "Destroy",
+          "description": "Destroy a plan",
           "href": "/plans/{(%2Fdefinitions%2Fplans%2Fdefinitions%2Fname)}",
           "method": "DELETE",
           "rel": "destroy",
@@ -2661,7 +3088,10 @@ module Komoju
           "description": "Name of resource"
         },
         "payment_details": {
-          "$ref": "#/definitions/payments/definitions/payment_details_response"
+          "type": [
+            "object"
+          ],
+          "description": "A hash or token describing the payment method."
         },
         "created_at": {
           "example": "2015-03-06T06:52:35Z",
@@ -2702,6 +3132,9 @@ module Komoju
       "properties": {
         "id": {
           "$ref": "#/definitions/tokens/definitions/id"
+        },
+        "payment_details": {
+          "$ref": "#/definitions/tokens/definitions/payment_details"
         },
         "resource": {
           "$ref": "#/definitions/tokens/definitions/resource"
