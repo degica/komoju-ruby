@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    komoju (0.0.6)
+    komoju (0.0.7)
       heroics (= 0.0.21)
       moneta
 
