@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-client = Komoju.connect("api-secret-key", url: "https://komoju.com/api/v1")
+client = Komoju.connect("api-secret-key")
 client.payments.show("55404024b7b0dd6ec490158925")
 
 payment_details = {
