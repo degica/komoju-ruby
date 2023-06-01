@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'heroics'
   spec.add_dependency 'moneta'
 
-  spec.add_development_dependency "bundler", "~> 1.7"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "bundler"
+  spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency 'minitest', '4.7.5'
   spec.add_development_dependency 'turn'
 end
